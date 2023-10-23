@@ -1,0 +1,1 @@
+export const MONGODB_URI="mongodb+srv://leinerdavidhc:WkZ40e2JyirB2taq@cluster0.jmlrw1s.mongodb.net/Taskdb"
