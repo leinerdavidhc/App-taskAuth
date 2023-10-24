@@ -1,9 +1,12 @@
 "use client";
 import { FormEvent, useState } from "react";
 import axios, { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function Register() {
-  const [error, setError] = useState();
+  const [error, setError] = useState("");
+  const router=useRouter()
   const handleSubmit = async (evet: FormEvent<HTMLFormElement>) => {
     evet.preventDefault();
     try {
@@ -14,6 +17,14 @@ export default function Register() {
         password: data.get("password"),
       });
       console.log(signupResponse);
+
+      const signinpResponse=await signIn("credentials",{
+        email: data.get("email"),
+        password: data.get("password"),
+        redirect: false,
+      })
+      if(signinpResponse?.error) setError(signinpResponse.error as string);
+      if(signinpResponse?.ok) return router.push("/dashboard")
     } catch (error) {
         console.log(error);
         if (error instanceof AxiosError) {

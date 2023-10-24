@@ -11,32 +11,21 @@ export async function POST(request: Request) {
 
     const UserFound = await User.findById(user);
 
-    if (UserFound) {
-      const task = await new Task({
-        title,
-        description,
-        user,
-      });
-      const TaskSave = await task.save();
-      return NextResponse.json({
-        title,
-        description,
-        user: TaskSave.user,
-        createdAt: TaskSave.createdAt,
-        updatedAt: TaskSave.updatedAt,
-      });
-    } else {
-      console.log("user does not exist");
+    if (!UserFound) throw new Error("Invalid credentials");
 
-      return NextResponse.json(
-        {
-          message: "user does not exist",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
+    const task = await new Task({
+      title,
+      description,
+      user,
+    });
+    const TaskSave = await task.save();
+    return NextResponse.json({
+      title,
+      description,
+      user: TaskSave.user,
+      createdAt: TaskSave.createdAt,
+      updatedAt: TaskSave.updatedAt,
+    });
   } catch (error) {
     console.log(error);
     if (error instanceof mongoose.Error.ValidationError) {

@@ -1,24 +1,25 @@
 "use client";
 import { FormEvent, useState } from "react";
-import axios, { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
-export default function Register() {
-  const [error, setError] = useState();
+export default function Login() {
+  const [error, setError] = useState("");
+  const router = useRouter();
   const handleSubmit = async (evet: FormEvent<HTMLFormElement>) => {
     evet.preventDefault();
     try {
       const data = new FormData(evet.currentTarget);
-      const signupResponse = await axios.post("/api/auth/signin", {
+      const signinpResponse = await signIn("credentials", {
         email: data.get("email"),
         password: data.get("password"),
+        redirect: false,
       });
-      console.log(signupResponse);
+      if (signinpResponse?.error) setError(signinpResponse.error as string);
+      if (signinpResponse?.ok) return router.push("/dashboard");
+      console.log(signinpResponse);
     } catch (error) {
-        console.log(error);
-        if (error instanceof AxiosError) {
-            const errorMessage=error.response?.data.message;
-            setError(errorMessage)
-        }
+      console.log(error);
     }
   };
 
@@ -27,7 +28,9 @@ export default function Register() {
       <div className="w-full max-w-sm m-auto bg-gray-900 p-8 rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold text-white mb-6">Login</h2>
         <form onSubmit={handleSubmit}>
-        {error && <div className="bg-red-500 text-white p-2 mb-2">{error}</div>}
+          {error && (
+            <div className="bg-red-500 text-white p-2 mb-2">{error}</div>
+          )}
           <div className="mb-4">
             <label className="block text-gray-400 mb-2" htmlFor="email">
               Email
